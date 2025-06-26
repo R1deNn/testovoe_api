@@ -12,18 +12,28 @@ class ProductService
      * Получить все продукты с пагинацией.
      *
      * @param int $perPage Количество элементов на странице
+     * @param array $filters Массив с фильтрами
      * @return \Illuminate\Pagination\LengthAwarePaginator Пагинированный список продуктов
      */
-    public function getAllProducts(int $perPage): LengthAwarePaginator
+    public function getAllProducts(array $filters = [], int $perPage): LengthAwarePaginator
     {
-        return Product::query()->paginate($perPage);
+        $query = Product::query();
+
+        if (!empty($filters['price_min'])) {
+            $query->where('price', '>=', $filters['price_min']);
+        }
+
+        if (!empty($filters['price_max'])) {
+            $query->where('price', '<=', $filters['price_max']);
+        }
+
+        return $query->paginate($perPage);
     }
 
     /**
      * Получить продукт по его ID.
      *
      * @param string $id UUID продукта
-     * @return \Illuminate\Http\JsonResponse Найденный продукт
      *
      */
     public function getById(string $id)

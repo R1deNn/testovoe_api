@@ -22,9 +22,14 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 20);
-        $products = $this->productService->getAllProducts($perPage);
-        return ProductResource::collection($products);
+        $filters = $request->only(['price_min', 'price_max']);
+        $perPage = $request->input('per_page', 15);
+
+        $products = $this->productService->getAllProducts($filters, $perPage);
+
+        return ProductResource::collection($products)
+            ->response()
+            ->setStatusCode(200);
     }
 
     public function show($id)

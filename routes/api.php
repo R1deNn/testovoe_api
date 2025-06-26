@@ -14,3 +14,16 @@ Route::middleware([StartSession::class])->group(function () {
     Route::put('cart/{product_id}', [\App\Http\Controllers\Api\CartController::class, 'update']);
     Route::delete('cart/{product_id}', [\App\Http\Controllers\Api\CartController::class, 'destroy']);
 });
+
+Route::post('/register', [\App\Http\Controllers\AuthController::class, 'register']);
+Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
+
+// Защищенные маршруты
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout']);
+
+    // Пример защищенного маршрута
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+});
