@@ -14,7 +14,16 @@ class UpdateCartRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'qty' => 'required|integer|min:1',
+            'qty' => ['required', 'integer', 'min:1'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'qty.required' => 'Необходимо задать количество товара',
+            'qty.integer' => 'Поле qty должно быть формата integer',
+            'qty.min' => 'Поле qty должно быть минимум 1'
         ];
     }
 }

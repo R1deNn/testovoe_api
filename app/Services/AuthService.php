@@ -29,7 +29,7 @@ class AuthService
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Неверные учетные данные'],
+                'email' => ['Неверные данные'],
             ]);
         }
 

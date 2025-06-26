@@ -10,6 +10,7 @@ class Product extends Model
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
 
+    public $keyType = 'string';
     public $incrementing = false;
 
     protected $fillable = [

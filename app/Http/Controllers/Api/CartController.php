@@ -7,38 +7,17 @@ use App\Http\Requests\StoreCartRequest;
 use App\Http\Requests\UpdateCartRequest;
 use App\Http\Resources\CartResource;
 use App\Services\Api\CartService;
-use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
-/**
- * CartController отвечает за операции с корзиной: просмотр, добавление,
- * обновление и удаление товаров.
-*/
-class CartController
+class CartController extends Controller
 {
-    /**
-     * CartService для работы с бизнес-логикой корзины.
-     *
-     * @param CartService $cartService
-     */
     public function __construct(protected CartService $cartService) {}
 
-    /**
-     * Получить текущие товары в корзине.
-     *
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection Коллекция ресурсов корзины
-     */
-    public function index(): AnonymousResourceCollection
+    public function index()
     {
         return CartResource::collection($this->cartService->all());
     }
 
-    /**
-     * Добавить товар в корзину.
-     *
-     * @param StoreCartRequest $request Валидация входящих данных (product_id, qty)
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection Обновлённая коллекция ресурсов корзины
-     */
-    public function store(StoreCartRequest $request): AnonymousResourceCollection
+    public function store(StoreCartRequest $request)
     {
         $cart = $this->cartService->add(
             $request->input('product_id'),
@@ -48,30 +27,16 @@ class CartController
         return CartResource::collection($cart);
     }
 
-    /**
-     * Обновить количество товара в корзине.
-     *
-     * @param UpdateCartRequest $request Валидация нового количества (qty)
-     * @param string $product_id UUID товара для обновления
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection Обновлённая коллекция ресурсов корзины
-     */
-    public function update(UpdateCartRequest $request, string $product_id): AnonymousResourceCollection
+    public function update(UpdateCartRequest $request, string $product_id)
     {
-        $cart = $this->cartService->update(
-            $product_id,
-            $request->input('qty')
-        );
+        $qty = $request->input('qty');
+
+        $cart = $this->cartService->update($product_id, $qty);
 
         return CartResource::collection($cart);
     }
 
-    /**
-     * Удалить товар из корзины.
-     *
-     * @param string $product_id UUID товара для удаления
-     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection Обновлённая коллекция ресурсов корзины
-     */
-    public function destroy(string $product_id): AnonymousResourceCollection
+    public function destroy(string $product_id)
     {
         $cart = $this->cartService->delete($product_id);
 

@@ -2,6 +2,7 @@
 
 namespace App\Services\Api;
 
+use App\Exceptions\ApiException;
 use App\Models\Product;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Session;
@@ -42,28 +43,27 @@ class CartService
      * @param string $productId UUID товара
      * @param int $qty Количество для добавления
      *
-     * @return \Illuminate\Http\JsonResponse Обновлённый массив корзины
+     * @return array Обновлённый массив корзины
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Если товар не найден
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException Если товар не в наличии или количество меньше минимального
+     * @throws ApiException Обработчик ошибок
      */
-    public function add(string $productId, int $qty)
+    public function add(string $productId, int $qty): array
     {
         $product = Product::find($productId);
 
         if (!$product) {
-            return $this->errorResponse('Продукт не найден', 404);
+            throw new ApiException('Товар не найден', 404);
         }
 
         if (!$product->in_stock) {
-            return $this->errorResponse('Продукт не в наличии');
+            throw new ApiException('Продукт не в наличии', 400);
         }
 
         if ($qty < $product->min_qty) {
-            return $this->errorResponse("Количество меньше минимального ({$product->min_qty})");
+            throw new ApiException("Количество меньше минимального {$product->min_qty}", 400);
         }
-
-        //TODO Лучше переделать на кастомные эксепшены, но с таким объемом апи норм
 
         $cart = $this->all();
 
@@ -98,7 +98,9 @@ class CartService
         $product = Product::findOrFail($productId);
 
         if ($qty < $product->min_qty) {
-            abort(400, 'Quantity less than minimum required');
+            throw new HttpResponseException(response()->json([
+                'error' => "Количество меньше минимального ({$product->min_qty})"
+            ], 400));
         }
 
         $cart = $this->all();
