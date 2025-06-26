@@ -19,5 +19,5 @@ namespace App\Swagger\Schemas;
  */
 class ProductSchema
 {
-    // Пустой класс — аннотация важна
+
 }
